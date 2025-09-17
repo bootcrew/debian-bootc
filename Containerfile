@@ -4,38 +4,12 @@ COPY files/ostree/prepare-root.conf /usr/lib/ostree/prepare-root.conf
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update -y && apt install -y libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev ostree
+RUN apt-get update -y && apt-get install -y ca-certificates
 
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+COPY noahm.sources /etc/apt/sources.list.d
+COPY noahm.gpg /etc/apt
+RUN apt-get update -y && apt-get install -y bootc coreos-bootupd ostree composefs
 
-ENV PATH="/root/.cargo/bin:${PATH}"
-ENV CARGO_FEATURES="composefs-backend"
-
-RUN --mount=type=tmpfs,dst=/tmp cd /tmp && \
-    git clone https://github.com/bootc-dev/bootc.git bootc && \
-    cd bootc && \
-    git fetch --all && \
-    git switch origin/composefs-backend-15-09-2025 -d && \
-    make && \
-    make install-all && \
-    make install-initramfs-dracut
-
-RUN --mount=type=tmpfs,dst=/tmp cd /tmp && \
-    git clone https://github.com/p5/coreos-bootupd.git bootupd && \
-    cd bootupd && \
-    git fetch --all && \
-    git switch origin/sdboot-support -d && \
-    /root/.cargo/bin/cargo build --release --bins --features systemd-boot && \
-    install -Dpm0755 -t /usr/bin ./target/release/bootupd && \
-    ln -s ./bootupd /usr/bin/bootupctl
-
-RUN --mount=type=tmpfs,dst=/tmp cd /tmp && \
-    git clone https://github.com/containers/composefs.git composefs && \
-    cd composefs && \
-    git fetch --all && \
-    meson setup build --prefix=/usr --default-library=shared -Dfuse=enabled && \
-    ninja -C build && \
-    ninja -C build install
 
 RUN apt install -y \
   dracut \

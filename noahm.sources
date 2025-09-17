@@ -1,0 +1,5 @@
+Types: deb deb-src
+URIs: https://people.debian.org/~noahm/debian-bootc
+Suites: sid
+Components: main
+Signed-By: /etc/apt/noahm.gpg
