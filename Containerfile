@@ -1,6 +1,5 @@
 FROM docker.io/library/debian:unstable
 
-COPY files/37composefs/ /usr/lib/dracut/modules.d/37composefs/
 COPY files/ostree/prepare-root.conf /usr/lib/ostree/prepare-root.conf
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,15 +8,17 @@ RUN apt update -y && apt install -y libzstd-dev libssl-dev pkg-config libostree-
 
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 
+ENV PATH="/root/.cargo/bin:${PATH}"
+ENV CARGO_FEATURES="composefs-backend"
+
 RUN --mount=type=tmpfs,dst=/tmp cd /tmp && \
     git clone https://github.com/bootc-dev/bootc.git bootc && \
     cd bootc && \
     git fetch --all && \
-    git switch origin/composefs-backend -d && \
-    /root/.cargo/bin/cargo build --release --bins && \
-    install -Dpm0755 -t /usr/bin ./target/release/bootc && \
-    install -Dpm0755 -t /usr/bin ./target/release/system-reinstall-bootc && \
-    install -Dpm0755 -t /usr/bin ./target/release/bootc-initramfs-setup
+    git switch origin/composefs-backend-15-09-2025 -d && \
+    make && \
+    make install-all && \
+    make install-initramfs-dracut
 
 RUN --mount=type=tmpfs,dst=/tmp cd /tmp && \
     git clone https://github.com/p5/coreos-bootupd.git bootupd && \
@@ -58,7 +59,6 @@ RUN apt install -y \
   fdisk \
   systemd-boot*
 
-RUN cp /usr/bin/bootc-initramfs-setup /usr/lib/dracut/modules.d/37composefs
 
 RUN echo "$(basename "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "*.img" | tail -n 1)")" > kernel_version.txt && \
     dracut --force --no-hostonly --reproducible --zstd --verbose --kver "$(cat kernel_version.txt)"  "/usr/lib/modules/$(cat kernel_version.txt)/initramfs.img" && \
@@ -66,10 +66,10 @@ RUN echo "$(basename "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "
     rm kernel_version.txt
 
 # If you want a desktop :)
-# RUN apt install -y gnome
+RUN apt install -y gnome
 
 # Alter root file structure a bit for ostree
-RUN mkdir -p /boot /sysroot /var/home && \
+RUN mkdir -p /boot /sysroot /var/home /var/roothome /var/usrlocal /var/srv && \
     rm -rf /var/log /home /root /usr/local /srv && \
     ln -s /var/home /home && \
     ln -s /var/roothome /root && \
