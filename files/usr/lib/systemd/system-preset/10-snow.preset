@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+
+# Make sure we have networking available.
+disable systemd-networkd.service
+disable systemd-networkd.socket
+disable systemd-networkd-wait-online.service
+enable systemd-resolved.service
+
+# Enable NetworkManager as well for desktop environments. systemd-networkd won't
+# manage any interfaces by default and so shouldn't conflict with
+# NetworkManager.
+enable NetworkManager.service
+enable NetworkManager-wait-online.service
+
+# These are not enabled by default in the default systemd preset.
+enable systemd-timesyncd.service
+
+
+# Disable avahi in favor of resolved
+disable avahi.*
+
+enable gdm.service
+enable pcscd.service
+enable power-profiles-daemon.service
+
+# Our own service to run systemctl preset --global.
+enable preset-global.service
+
+# Prefer socket activated SSH over daemon SSH
+disable sshd.service
+disable ssh.service
+enable sshd.socket
+enable ssh.socket
+enable sshd-keygen.service
