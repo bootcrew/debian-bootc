@@ -1,0 +1,11 @@
+[Unit]
+Description=Mount boot partition
+
+[Mount]
+What=/dev/disk/by-partlable/EFI-SYSTEM
+Where=/sysroot/boot
+Type=vfat
+Options=rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro
+
+[Install]
+WantedBy=local-fs.target

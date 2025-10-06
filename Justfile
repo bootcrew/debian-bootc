@@ -19,10 +19,10 @@ bootc *ARGS:
         --security-opt label=type:unconfined_t \
         "{{image_name}}:{{image_tag}}" bootc {{ARGS}}
 
-generate-bootable-image $output_directory=output_directory $filesystem=filesystem:
+generate-bootable-image $disk_image=disk_image $output_directory=output_directory $filesystem=filesystem:
     #!/usr/bin/env bash
     if [ ! -e "${output_directory}/${disk_image}" ] ; then
         fallocate -l 20G "${output_directory}/${disk_image}"
     fi
-    just bootc install to-disk --composefs-backend --via-loopback /data/${disk_image} --filesystem "${filesystem}" --wipe --bootloader systemd
+    just bootc install to-disk --composefs-backend --via-loopback /data/${disk_image} --filesystem "${filesystem}" --wipe --karg=gnome.initial-setup=1 --bootloader systemd
 
