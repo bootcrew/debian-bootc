@@ -24,4 +24,4 @@ generate-bootable-image $base_dir=base_dir $filesystem=filesystem:
     if [ ! -e "${base_dir}/bootable.img" ] ; then
         fallocate -l 20G "${base_dir}/bootable.img"
     fi
-    just bootc install to-disk --composefs-native --via-loopback /data/bootable.img --filesystem "${filesystem}" --wipe --bootloader systemd
+    just bootc install to-disk --composefs-backend --via-loopback /data/bootable.img --filesystem "${filesystem}" --wipe --bootloader systemd

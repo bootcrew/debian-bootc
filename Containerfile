@@ -8,17 +8,12 @@ RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-lan
     apt update -y && \
     apt install -y $DEV_DEPS ostree
 
-RUN --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/root \
+ENV CARGO_HOME=/tmp/rust
+ENV RUSTUP_HOME=/tmp/rust
+RUN --mount=type=tmpfs,dst=/tmp \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
     git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
-    cd /tmp/bootc && \
-    CARGO_FEATURES="composefs-backend" PATH="/root/.cargo/bin:$PATH" make bin && \
-    make install-all && \
-    make install-initramfs-dracut && \
-    git clone https://github.com/p5/coreos-bootupd.git -b sdboot-support /tmp/bootupd && \
-    cd /tmp/bootupd && \
-    /root/.cargo/bin/cargo build --release --bins --features systemd-boot && \
-    make install
+    sh -c ". ${RUSTUP_HOME}/env ; env CARGO_FEATURES=\"composefs-backend\" make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
 ENV DRACUT_NO_XATTR=1
 RUN apt install -y \
@@ -43,7 +38,6 @@ RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 RUN apt remove -y $DEV_DEPS && \
     apt autoremove -y
-ENV DEV_DEPS=
 
 # Update useradd default to /var/home instead of /home for User Creation
 RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd"
