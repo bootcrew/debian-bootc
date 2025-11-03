@@ -2,7 +2,7 @@ FROM docker.io/library/debian:stable
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Antipattern but we are doing this since `apt`/`debootstrap` does not allow chroot installation on unprivileged podman builds
-ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut autoconf automake libtool bison flex"
+ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut autoconf automake libtool bison flex jq"
 
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-languages && \
     apt update -y && \
@@ -12,9 +12,9 @@ ENV CARGO_HOME=/tmp/rust
 ENV RUSTUP_HOME=/tmp/rust
 RUN --mount=type=tmpfs,dst=/tmp \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
-    git clone https://github.com/ostreedev/ostree.git /tmp/ostree && \
+    git clone https://github.com/ostreedev/ostree.git --branch "$(curl https://api.github.com/repos/ostreedev/ostree/tags | jq -r '.[0].name')" --depth 1 /tmp/ostree && \
     sh -c "cd /tmp/ostree ; git submodule update --init ; env NOCONFIGURE=1 ./autogen.sh ; ./configure ; make ; make install DESTDIR=/usr" && \
-    git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
+    git clone https://github.com/bootc-dev/bootc.git --branch "$(curl https://api.github.com/repos/bootc-dev/bootc/tags | jq -r '.[0].name')" --depth 1 /tmp/bootc && \
     sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
 ENV DRACUT_NO_XATTR=1
