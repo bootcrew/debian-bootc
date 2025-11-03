@@ -41,7 +41,7 @@ RUN apt remove -y $DEV_DEPS && \
 # Update useradd default to /var/home instead of /home for User Creation
 RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd"
 
-RUN rm -rf /var /boot /home /root /usr/local /srv && \
+RUN rm -rf /boot /home /root /usr/local /srv && \
     mkdir -p /var && \
     ln -s /var/home /home && \
     ln -s /var/roothome /root && \
@@ -52,7 +52,7 @@ RUN rm -rf /var /boot /home /root /usr/local /srv && \
 
 # Necessary for `bootc install`
 RUN mkdir -p /usr/lib/ostree && \
-    printf  "[composefs]\nenabled = yes\n[sysroot]\nreadonly = true\n" | \
+    printf "[composefs]\nenabled = yes\n[sysroot]\nreadonly = true\n" | \
     tee "/usr/lib/ostree/prepare-root.conf"
 
 RUN bootc container lint
