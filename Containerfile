@@ -13,9 +13,9 @@ ENV RUSTUP_HOME=/tmp/rust
 RUN --mount=type=tmpfs,dst=/tmp \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
     git clone https://github.com/ostreedev/ostree.git --branch "$(curl https://api.github.com/repos/ostreedev/ostree/tags | jq -r '.[0].name')" --depth 1 /tmp/ostree && \
-    sh -c "cd /tmp/ostree ; git submodule update --init ; env NOCONFIGURE=1 ./autogen.sh ; ./configure ; make ; make install DESTDIR=/usr" && \
+    sh -c "cd /tmp/ostree ; git submodule update --init ; env NOCONFIGURE=1 ./autogen.sh ; ./configure --prefix=/usr --libdir=/usr/lib --sysconfdir=/etc ; make ; make install" && \
     git clone https://github.com/bootc-dev/bootc.git --branch "$(curl https://api.github.com/repos/bootc-dev/bootc/tags | jq -r '.[0].name')" --depth 1 /tmp/bootc && \
-    sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
+    sh -c ". ${RUSTUP_HOME}/env ; export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
 ENV DRACUT_NO_XATTR=1
 RUN apt install -y \
