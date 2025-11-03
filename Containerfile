@@ -33,6 +33,7 @@ RUN sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 
     cp /boot/vmlinuz-$KERNEL_VERSION "/usr/lib/modules/$KERNEL_VERSION/vmlinuz"'
 
 # Setup a temporary root passwd (changeme) for dev purposes
+# RUN apt install -y whois
 # RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 RUN apt remove -y $DEV_DEPS && \
