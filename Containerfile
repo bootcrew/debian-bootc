@@ -13,7 +13,7 @@ ENV RUSTUP_HOME=/tmp/rust
 RUN --mount=type=tmpfs,dst=/tmp \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
     git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
-    sh -c ". ${RUSTUP_HOME}/env ; env CARGO_FEATURES=\"composefs-backend\" make -C /tmp/bootc bin install-all install-initramfs-dracut"
+    sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
 ENV DRACUT_NO_XATTR=1
 RUN apt install -y \
