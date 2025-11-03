@@ -1,6 +1,6 @@
 image_name := env("BUILD_IMAGE_NAME", "debian-bootc")
 image_tag := env("BUILD_IMAGE_TAG", "latest")
-output_directory := env("BUILD_BASE_DIR", "/tmp")
+output_directory := env("BUILD_OUTPUT_DIR", "/tmp")
 filesystem := env("BUILD_FILESYSTEM", "ext4")
 disk_image := env("BUILD_DISK_IMAGE", "bootable.img")
 

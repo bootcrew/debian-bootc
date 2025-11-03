@@ -15,7 +15,6 @@ RUN --mount=type=tmpfs,dst=/tmp \
     git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
     sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
-
 # Install required packages for bootc images
 ENV DRACUT_NO_XATTR=1
 RUN apt install -y \
@@ -51,10 +50,19 @@ RUN apt install -y --no-install-recommends \
   task-desktop \
   tasksel \
   network-manager-gnome \
-  gnome-initial-setup
+  gnome-initial-setup \
+  locales \
+  keyboard-configuration
+
+
+# Update useradd default to /var/home instead of /home for User Creation
+RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd"
 
 ### Prepare final image
-RUN rm -rf /boot /home /root /usr/local /srv && \
+RUN locale-gen en_US.UTF-8 && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8 && \
+    rm -rf /boot /home /root /usr/local /srv && \
     mkdir -p /var && \
     ln -s /var/home /home && \
     ln -s /var/roothome /root && \
@@ -67,9 +75,5 @@ RUN rm -rf /boot /home /root /usr/local /srv && \
 RUN mkdir -p /usr/lib/ostree && \
     printf "[composefs]\nenabled = yes\n[sysroot]\nreadonly = true\n" | \
     tee "/usr/lib/ostree/prepare-root.conf"
-# delete the root account from /etc/passwd and /etc/shadow
-RUN passwd --delete root && \
-    passwd --lock root
-
 
 RUN bootc container lint
