@@ -1,19 +1,21 @@
-FROM docker.io/library/debian:unstable
+FROM docker.io/library/debian:stable
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Antipattern but we are doing this since `apt`/`debootstrap` does not allow chroot installation on unprivileged podman builds
-ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut"
+ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config curl git build-essential meson libfuse3-dev liblzma-dev e2fslibs-dev libgpgme-dev go-md2man dracut autoconf automake libtool libglib2.0-dev bison flex jq"
 
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-languages && \
     apt update -y && \
-    apt install -y $DEV_DEPS ostree
+    apt install -y $DEV_DEPS
 
 ENV CARGO_HOME=/tmp/rust
 ENV RUSTUP_HOME=/tmp/rust
 RUN --mount=type=tmpfs,dst=/tmp \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
-    git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
-    sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
+    git clone https://github.com/ostreedev/ostree.git --depth 1 /tmp/ostree && \
+    sh -c "cd /tmp/ostree ; git submodule update --init ; env NOCONFIGURE=1 ./autogen.sh ; ./configure --prefix=/usr --libdir=/usr/lib --sysconfdir=/etc ; make ; make install" && \
+    git clone https://github.com/bootc-dev/bootc.git --depth 1 /tmp/bootc && \
+    sh -c ". ${RUSTUP_HOME}/env ; export PKG_CONFIG_PATH=/usr/lib/pkgconfig:/usr/share/pkgconfig ; make -C /tmp/bootc bin install-all install-initramfs-dracut"
 
 ENV DRACUT_NO_XATTR=1
 RUN apt install -y \
