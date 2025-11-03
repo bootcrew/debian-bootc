@@ -2,7 +2,7 @@ FROM docker.io/library/debian:unstable
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Antipattern but we are doing this since `apt`/`debootstrap` does not allow chroot installation on unprivileged podman builds
-ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut whois"
+ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut"
 
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-languages && \
     apt update -y && \
@@ -33,8 +33,7 @@ RUN sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 
     cp /boot/vmlinuz-$KERNEL_VERSION "/usr/lib/modules/$KERNEL_VERSION/vmlinuz"'
 
 # Setup a temporary root passwd (changeme) for dev purposes
-# TODO: Replace this for a more robust option when in prod
-RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
+# RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 RUN apt remove -y $DEV_DEPS && \
     apt autoremove -y
