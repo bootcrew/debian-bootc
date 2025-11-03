@@ -2,11 +2,11 @@ FROM docker.io/library/debian:stable
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Antipattern but we are doing this since `apt`/`debootstrap` does not allow chroot installation on unprivileged podman builds
-ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config libostree-dev curl git build-essential meson libfuse3-dev go-md2man dracut autoconf automake libtool bison flex jq"
+ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config curl git build-essential meson libfuse3-dev liblzma-dev e2fslibs-dev libgpgme-dev go-md2man dracut autoconf automake libtool libglib2.0-dev bison flex jq"
 
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-languages && \
     apt update -y && \
-    apt install -y $DEV_DEPS ostree
+    apt install -y $DEV_DEPS
 
 ENV CARGO_HOME=/tmp/rust
 ENV RUSTUP_HOME=/tmp/rust
