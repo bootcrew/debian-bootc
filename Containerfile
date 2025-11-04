@@ -2,7 +2,7 @@ FROM docker.io/library/debian:stable
 
 ARG DEBIAN_FRONTEND=noninteractive
 # Antipattern but we are doing this since `apt`/`debootstrap` does not allow chroot installation on unprivileged podman builds
-ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config curl git build-essential meson libfuse3-dev liblzma-dev e2fslibs-dev libgpgme-dev go-md2man dracut autoconf automake libtool libglib2.0-dev bison flex jq"
+ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config curl git build-essential meson libfuse3-dev liblzma-dev e2fslibs-dev libext2fs-dev libgpgme-dev go-md2man dracut autoconf automake libtool libglib2.0-dev bison flex jq"
 
 RUN rm /etc/apt/apt.conf.d/docker-gzip-indexes /etc/apt/apt.conf.d/docker-no-languages && \
     apt update -y && \
@@ -29,7 +29,8 @@ RUN apt install -y \
   linux-image-generic \
   skopeo \
   systemd \
-  systemd-boot* \
+  systemd-boot \
+  systemd-boot-* \
   xfsprogs
 
 RUN sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "*.img" | tail -n 1)")" && \
@@ -40,8 +41,8 @@ RUN sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 
 # RUN apt install -y whois
 # RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
-RUN apt remove -y $DEV_DEPS && \
-    apt autoremove -y
+RUN apt purge -y $DEV_DEPS && \
+    apt autoremove -y --purge
 
 # Update useradd default to /var/home instead of /home for User Creation
 RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd"
