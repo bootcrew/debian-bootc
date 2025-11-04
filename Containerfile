@@ -50,7 +50,6 @@ RUN rm -rf /boot /home /root /usr/local /srv && \
     ln -s /var/roothome /root && \
     ln -s /var/srv /srv && \
     ln -s sysroot/ostree ostree && \
-    ln -s /var/usrlocal /usr/local && \
     mkdir -p /sysroot /boot
 
 # Necessary for `bootc install`
