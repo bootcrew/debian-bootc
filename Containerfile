@@ -48,6 +48,9 @@ RUN sed -i 's|^HOME=.*|HOME=/var/home|' "/etc/default/useradd"
 
 RUN rm -rf /boot /home /root /usr/local /srv && \
     mkdir -p /var && \
+    mkdir -p /var/home && \
+    mkdir -p /var/roothome && \
+    mkdir -p /var/srv && \
     ln -s /var/home /home && \
     ln -s /var/roothome /root && \
     ln -s /var/srv /srv && \
