@@ -1,6 +1,6 @@
 # Debian Bootc
 
-Reference [debian](http://debian.org/) container image configured for [bootc](https://github.com/bootc-dev/bootc) usage.
+Reference [Debian](https://debian.org/) container image preconfigured for [bootc](https://github.com/bootc-dev/bootc) usage.
 
 <img width="2196" height="1239" alt="image" src="https://github.com/user-attachments/assets/0b031de0-5593-49e8-8e5a-535ebdcf46e3" />
 
