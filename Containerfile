@@ -27,8 +27,8 @@ ENV DEV_DEPS="libzstd-dev libssl-dev pkg-config curl git build-essential meson l
 RUN --mount=type=tmpfs,dst=/tmp \
     apt update -y && \
     apt install -y $DEV_DEPS libostree-dev ostree && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --profile minimal -y && \
-    git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
+    curl --proto '=https' --tlsv1.2 -sSf "https://sh.rustup.rs" | sh -s -- --profile minimal -y && \
+    git clone "https://github.com/bootc-dev/bootc.git" /tmp/bootc && \
     sh -c ". ${RUSTUP_HOME}/env ; make -C /tmp/bootc bin install-all install-initramfs-dracut" && \
     sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "*.img" | tail -n 1)")" && dracut --force --no-hostonly --reproducible --zstd --verbose --kver "$KERNEL_VERSION"  "/usr/lib/modules/$KERNEL_VERSION/initramfs.img" && cp /boot/vmlinuz-$KERNEL_VERSION "/usr/lib/modules/$KERNEL_VERSION/vmlinuz"' && \
     apt purge -y $DEV_DEPS && \
