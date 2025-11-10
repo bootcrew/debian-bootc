@@ -1,6 +1,6 @@
 # Debian Bootc
 
-Experiment to see if Bootc could work on Debian
+Reference [debian](http://debian.org/) container image configured for [bootc](https://github.com/bootc-dev/bootc) usage.
 
 <img width="2196" height="1239" alt="image" src="https://github.com/user-attachments/assets/0b031de0-5593-49e8-8e5a-535ebdcf46e3" />
 
@@ -13,3 +13,7 @@ just generate-bootable-image # Generates a bootable image for you using bootc!
 ```
 
 Then you can run the `bootable.img` as your boot disk in your preferred hypervisor.
+
+## Notes
+
+For Debian Stable, please take a look at <https://github.com/linuxsnow/debian-bootc-core> or pull request workflows in order to make it work in this repo. Thank you!
