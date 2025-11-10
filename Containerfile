@@ -4,16 +4,16 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y && \
   apt install -y \
-  btrfs-progs \
-  dosfstools \
-  e2fsprogs \
-  fdisk \
-  firmware-linux-free \
-  linux-image-generic \
-  skopeo \
-  systemd \
-  systemd-boot* \
-  xfsprogs && \
+      btrfs-progs \
+      dosfstools \
+      e2fsprogs \
+      fdisk \
+      firmware-linux-free \
+      linux-image-generic \
+      skopeo \
+      systemd \
+      systemd-boot* \
+      xfsprogs && \
   rm -rf /var/lib/apt/lists/* && \
   apt clean -y
 
