@@ -53,4 +53,7 @@ RUN echo "HOME=/var/home" | tee -a "/etc/default/useradd" && \
 # RUN apt update -y && apt install -y whois
 # RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
+# https://bootc-dev.github.io/bootc/bootc-images.html#standard-metadata-for-bootc-compatible-images
+LABEL containers.bootc 1
+
 RUN bootc container lint
