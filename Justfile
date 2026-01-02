@@ -3,11 +3,13 @@ image_tag := env("BUILD_IMAGE_TAG", "latest")
 base_dir := env("BUILD_BASE_DIR", ".")
 filesystem := env("BUILD_FILESYSTEM", "ext4")
 
+container_runtime := env("CONTAINER_RUNTIME", `command -v podman >/dev/null 2>&1 && echo podman || echo docker`)
+
 build-containerfile $image_name=image_name:
-    sudo podman build -t "${image_name}:latest" .
+    sudo {{container_runtime}} build -f Containerfile -t "${image_name}:latest" .
 
 bootc *ARGS:
-    sudo podman run \
+    sudo {{container_runtime}} run \
         --rm --privileged --pid=host \
         -it \
         -v /sys/fs/selinux:/sys/fs/selinux \
